@@ -202,7 +202,7 @@ OP_NAMESPACE_BEGIN
         conf_get_int64(props, "snapshot-max-lag-offset", snapshot_max_lag_offset);
         conf_get_int64(props, "maxsnapshots", maxsnapshots);
 
-        if(maxsnapshots < 1)
+        if(maxsnapshots == 0)
         {
             maxsnapshots = 1;
         }
@@ -295,6 +295,7 @@ OP_NAMESPACE_BEGIN
         conf_get_int64(props, "qps-limit-per-host", qps_limit_per_host);
         conf_get_int64(props, "qps-limit-per-connection", qps_limit_per_connection);
         conf_get_int64(props, "range-delete-min-size", range_delete_min_size);
+        conf_get_int64(props, "stream-lru-cache-size", stream_lru_cache_size);
 
         //trusted_ip.clear();
         Properties::const_iterator ip_it = props.find("trusted-ip");

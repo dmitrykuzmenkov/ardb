@@ -84,6 +84,7 @@ namespace ardb
             REDIS_CMD_MONITOR = 40,
             REDIS_CMD_DEBUG = 41,
             REDIS_CMD_BACKUP = 42,
+			REDIS_CMD_COMMAND = 43,
 
             //'keys' commands
             REDIS_CMD_DEL = 50,
@@ -111,6 +112,7 @@ namespace ardb
             REDIS_CMD_RESTOREDB = 72,
             REDIS_CMD_RESTORECHUNK = 73,
             REDIS_CMD_TOUCH = 74,
+			REDIS_CMD_UNLINK = 75,
 
             //'string' commands
             REDIS_CMD_APPEND = 100,
@@ -207,6 +209,10 @@ namespace ardb
             REDIS_CMD_GEO_DIST = 276,
             REDIS_CMD_GEO_HASH = 277,
             REDIS_CMD_GEO_POS = 278,
+            REDIS_CMD_ZPOPMIN = 279,
+            REDIS_CMD_ZPOPMAX = 280,
+            REDIS_CMD_BZPOPMIN = 281,
+            REDIS_CMD_BZPOPMAX = 282,
 
             //'list' commands
             REDIS_CMD_LINDEX = 300,
@@ -226,6 +232,21 @@ namespace ardb
             REDIS_CMD_LPUSHX = 315,
             REDIS_CMD_LRANGE = 316,
             REDIS_CMD_LSET = 317,
+
+            //'stream' commands
+            REDIS_CMD_XADD= 400,
+            REDIS_CMD_XRANGE= 401,
+            REDIS_CMD_XREVRANGE= 402,
+            REDIS_CMD_XLEN= 403,
+            REDIS_CMD_XREAD= 404,
+            REDIS_CMD_XREADGROUP= 405,
+            REDIS_CMD_XGROUP= 406,
+            REDIS_CMD_XACK= 406,
+            REDIS_CMD_XPENDING= 407,
+            REDIS_CMD_XCLAIM= 408,
+            REDIS_CMD_XINFO= 409,
+            REDIS_CMD_XDEL= 410,
+            REDIS_CMD_XTRIM= 411,
 
             //cluster commands
             REDIS_CMD_CLUSTER = 500,  //used in cluster mode

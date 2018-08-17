@@ -10,6 +10,7 @@
 #include "util/murmur3.h"
 #include "util/string_helper.hpp"
 #include "util/math_helper.hpp"
+#include "util/network_helper.hpp"
 #include <cmath>
 
 OP_NAMESPACE_BEGIN
@@ -19,23 +20,23 @@ OP_NAMESPACE_BEGIN
         E_INT64 = 1, E_FLOAT64 = 2, E_CSTR = 3, E_SDS = 4
     };
 
-    Data::Data() :
-            data(0), len(0), encoding(0)
+    Data::Data()
+            : data(0), len(0), encoding(0)
     {
         //value.iv = 0;
     }
-    Data::Data(const std::string& v, bool try_int_encoding) :
-            data(0), len(0), encoding(0)
+    Data::Data(const std::string& v, bool try_int_encoding)
+            : data(0), len(0), encoding(0)
     {
         SetString(v, try_int_encoding);
     }
 
-    Data::Data(int64_t v) :
-            data(v), len(0), encoding(E_INT64)
+    Data::Data(int64_t v)
+            : data(v), len(0), encoding(E_INT64)
     {
     }
-    Data::Data(double v) :
-            len(0), encoding(E_FLOAT64)
+    Data::Data(double v)
+            : len(0), encoding(E_FLOAT64)
     {
         memcpy(&data, &v, sizeof(data));
     }
@@ -50,8 +51,8 @@ OP_NAMESPACE_BEGIN
         Clear();
     }
 
-    Data::Data(const Data& other) :
-            data(0), len(0), encoding(0)
+    Data::Data(const Data& other)
+            : data(0), len(0), encoding(0)
     {
         Clone(other);
     }
@@ -190,7 +191,7 @@ OP_NAMESPACE_BEGIN
         }
         else
         {
-            data = (int64_t)str;
+            data = (int64_t) str;
             //memcpy(&data, &str, sizeof(const char*));
             encoding = E_CSTR;
         }
@@ -275,7 +276,8 @@ OP_NAMESPACE_BEGIN
         {
             if (IsInteger() && right.IsInteger())
             {
-                return GetInt64() - right.GetInt64();
+                int64_t cmp = GetInt64() - right.GetInt64();
+                return cmp > 0 ? 1 : (cmp < 0 ? -1 : 0);
             }
             if (IsNumber() && right.IsNumber())
             {
@@ -327,7 +329,7 @@ OP_NAMESPACE_BEGIN
             other_raw_data = data_buf;
         }
         size_t min_len = left_len < right_len ? left_len : right_len;
-        if(0 == min_len)
+        if (0 == min_len)
         {
             return left_len - right_len;
         }
@@ -478,6 +480,41 @@ OP_NAMESPACE_BEGIN
     bool DataEqual::operator()(const Data& s1, const Data& s2) const
     {
         return s1.Compare(s2, false) == 0;
+    }
+
+    /* Compare two stream IDs. Return -1 if a < b, 0 if a == b, 1 if a > b. */
+    int StreamID::Compare(const StreamID& other) const
+    {
+        if (ms > other.ms) return 1;
+        else if (ms < other.ms) return -1;
+        /* The ms part is the same. Check the sequence part. */
+        else if (seq > other.seq) return 1;
+        else if (seq < other.seq) return -1;
+        /* Everything is the same: IDs are equal. */
+        return 0;
+    }
+    void StreamID::Encode(Data& data) const
+    {
+        uint64_t ids[2];
+        ids[0] = hton_u64(ms);
+        ids[1] = hton_u64(seq);
+        data.SetString((const char*) ids, 16, true);
+    }
+    void StreamID::Decode(const Data& data)
+    {
+        if(data.StringLength() >= 16)
+        {
+            uint64_t ids[2];
+            memcpy(ids, data.CStr(), 16);
+            ms = ntoh_u64(ids[0]);
+            seq = ntoh_u64(ids[1]);
+        }
+    }
+    void StreamID::ToString(std::string& str) const
+    {
+        str.resize(512);
+        int n = sprintf(&str[0], "%" PRIu64 "-%" PRIu64 , ms, seq);
+        str.resize(n);
     }
 
 OP_NAMESPACE_END

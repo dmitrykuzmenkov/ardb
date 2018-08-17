@@ -107,7 +107,7 @@ OP_NAMESPACE_BEGIN
             }
             meta.SetType(KEY_HASH);
             meta.SetObjectLen(-1);
-            meta.SetTTL(0); //clear ttl setting
+            //meta.SetTTL(meta.GetTTL()); //clear ttl setting
             SetKeyValue(ctx, key, meta);
 
             for (size_t i = 1; i < cmd.GetArguments().size(); i += 2)
@@ -172,7 +172,7 @@ OP_NAMESPACE_BEGIN
                 }
                 meta.SetType(KEY_HASH);
                 meta.SetObjectLen(-1);
-                meta.SetTTL(0); //clear ttl setting
+                //meta.SetTTL(0); //clear ttl setting
                 SetKeyValue(ctx, key, meta);
             }
             if (0 != ctx.transc_err)
@@ -219,7 +219,7 @@ OP_NAMESPACE_BEGIN
         }
         if (0 == err)
         {
-            vals[0].SetTTL(0);
+            //vals[0].SetTTL(0);
             {
                 WriteBatchGuard batch(ctx, m_engine);
                 for (size_t i = 0; i < keys.size(); i++)
@@ -268,13 +268,14 @@ OP_NAMESPACE_BEGIN
             {
                 if (field.GetType() == KEY_META && field.GetKey() == key.GetKey())
                 {
-
                     ValueObject& meta = iter->Value();
-
-                    if (meta.GetType() != KEY_HASH)
+                    if (!CheckMeta(ctx, key, KEY_HASH, meta))
                     {
-                        reply.SetErrCode(ERR_WRONG_TYPE);
-                        break;
+                        return 0;
+                    }
+                    if (meta.GetType() == 0)
+                    {
+                        return 0;
                     }
                     checked_meta = true;
                     iter->Next();

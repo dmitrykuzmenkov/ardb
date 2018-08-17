@@ -37,6 +37,7 @@
 
 using namespace ardb;
 
+
 int main()
 {
     Ardb db;
@@ -64,7 +65,7 @@ int main()
                 fprintf(stderr, "%s %s\n", fs[i].c_str(), r.Error().c_str());
             }
             uint64 end = get_current_epoch_millis();
-            printf("=======================%s Test End(%llums)============================\n\n", fs[i].c_str(), (end - start));
+            printf("=======================%s Test End(%" PRIu64 "ms)============================\n\n", fs[i].c_str(), (end - start));
             if(r.IsErr())
             {
                 return -1;

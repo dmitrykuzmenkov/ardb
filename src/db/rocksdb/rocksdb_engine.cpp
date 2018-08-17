@@ -218,10 +218,14 @@ OP_NAMESPACE_BEGIN
                     char* buffer = NULL;
                     size_t buf_len = 1024;
                     NEW(buffer, char[buf_len]);
+                    if(NULL == buffer)
+                    {
+                        return;
+                    }
                     int n = vsnprintf(buffer, buf_len - 1, format, ap);
                     if (n > 0 && NULL != buffer)
                     {
-                        if (n < buf_len)
+                        if ((size_t)n < buf_len)
                         {
                             buffer[n] = 0;
                         }
@@ -417,7 +421,7 @@ OP_NAMESPACE_BEGIN
                     {
                         return false;
                     }
-                    if (meta.GetTTL() > 0 && meta.GetTTL() <= get_current_epoch_millis())
+                    if (meta.GetTTL() > 0 && meta.GetTTL() <= (int64_t)get_current_epoch_millis())
                     {
                         g_db->AddExpiredKey(ns, k.GetKey());
                         return false;

@@ -593,6 +593,11 @@ OP_NAMESPACE_BEGIN
                 reply.SetStatusString("string");
                 break;
             }
+            case KEY_STREAM:
+            {
+                reply.SetStatusString("stream");
+                break;
+            }
             default:
             {
                 reply.SetStatusString("invalid");
@@ -915,13 +920,30 @@ OP_NAMESPACE_BEGIN
                 iter->Next();
             }
         }
-
+        if(meta_obj.GetType() == KEY_STREAM)
+        {
+            StreamDel(ctx, meta_key);
+        }
         if (removed > 0)
         {
             TouchWatchKey(ctx, meta_key);
             ctx.dirty++;
         }
         return removed;
+    }
+
+    int Ardb::Unlink(Context& ctx, RedisCommandFrame& cmd)
+    {
+        RedisReply& reply = ctx.GetReply();
+        int removed = 0;
+
+        for (size_t i = 0; i < cmd.GetArguments().size(); i++)
+        {
+        	AsyncDeleteKey(ctx, ctx.ns, cmd.GetArguments()[i]);
+            removed++;
+        }
+        reply.SetInteger(removed);
+        return 0;
     }
 
     int Ardb::Del(Context& ctx, RedisCommandFrame& cmd)
